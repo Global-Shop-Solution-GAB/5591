@@ -1,0 +1,539 @@
+Program.Sub.ScreenSU.Start
+Gui.F_PL_List..Create
+Gui.F_PL_List..Caption("PL Maint")
+Gui.F_PL_List..Size(5010,8610)
+Gui.F_PL_List..MinX(4000)
+Gui.F_PL_List..MinY(7500)
+Gui.F_PL_List..Position(0,0)
+Gui.F_PL_List..BackColor(-2147483633)
+Gui.F_PL_List..MousePointer(0)
+Gui.F_PL_List..Event(UnLoad,F_PL_List_UnLoad)
+Gui.F_PL_List.lblPL.Create(Label,"Product Line",True,1935,255,0,165,195,True,0,"Arial",8,-2147483633,0)
+Gui.F_PL_List.txtPL.Create(TextBox,"",True,1215,300,0,165,450,True,0,"Arial",8,-2147483643,1)
+Gui.F_PL_List.txtPL.MaxLength(2)
+Gui.F_PL_List.txtPL.Event(LostFocus,txtPL_LostFocus)
+Gui.F_PL_List.txtPL.Event(KeyPressEnter,txtPL_KeyPressEnter)
+Gui.F_PL_List.txtPL.TabStop(True)
+Gui.F_PL_List.txtPL.TabIndex(1)
+Gui.F_PL_List.cmdPLBRW.Create(Button)
+Gui.F_PL_List.cmdPLBRW.Size(375,375)
+Gui.F_PL_List.cmdPLBRW.Position(1605,420)
+Gui.F_PL_List.cmdPLBRW.Caption("^")
+Gui.F_PL_List.cmdPLBRW.Event(Click,cmdPLBRW_Click)
+Gui.F_PL_List.cmdPLBRW.TabStop(True)
+Gui.F_PL_List.cmdPLBRW.TabIndex(2)
+Gui.F_PL_List.cmdAdd.Create(Button)
+Gui.F_PL_List.cmdAdd.Size(855,375)
+Gui.F_PL_List.cmdAdd.Position(195,1035)
+Gui.F_PL_List.cmdAdd.TabStop(True)
+Gui.F_PL_List.cmdAdd.TabIndex(3)
+Gui.F_PL_List.cmdAdd.Caption("Add")
+Gui.F_PL_List.cmdAdd.Event(Click,cmdAdd_Click)
+Gui.F_PL_List.cmdDelete.Create(Button)
+Gui.F_PL_List.cmdDelete.Size(855,375)
+Gui.F_PL_List.cmdDelete.Position(1320,1035)
+Gui.F_PL_List.cmdDelete.TabStop(True)
+Gui.F_PL_List.cmdDelete.TabIndex(4)
+Gui.F_PL_List.cmdDelete.Caption("Delete")
+Gui.F_PL_List.cmdDelete.Event(Click,cmdDelete_Click)
+Gui.F_PL_List.gsgcPLList.Create(GsGridControl)
+Gui.F_PL_List.gsgcPLList.Size(4890,5925)
+Gui.F_PL_List.gsgcPLList.Position(0,1635)
+Gui.F_PL_List.gsgcPLList.Anchor(15)
+Gui.F_PL_List.cmdSave.Create(Button)
+Gui.F_PL_List.cmdSave.Size(855,375)
+Gui.F_PL_List.cmdSave.Position(195,7770)
+Gui.F_PL_List.cmdSave.Caption("Save")
+Gui.F_PL_List.cmdSave.Event(Click,cmdSave_Click)
+Gui.F_PL_List.cmdSave.Anchor(6)
+Gui.F_Trans_Circuit..Create
+Gui.F_Trans_Circuit..Caption("Set Circuit Designator")
+Gui.F_Trans_Circuit..Size(8565,5115)
+Gui.F_Trans_Circuit..MinX(0)
+Gui.F_Trans_Circuit..MinY(0)
+Gui.F_Trans_Circuit..Position(0,0)
+Gui.F_Trans_Circuit..BackColor(-2147483633)
+Gui.F_Trans_Circuit..MousePointer(0)
+Gui.F_Trans_Circuit..Event(UnLoad,F_Trans_Circuit_UnLoad)
+Gui.F_Trans_Circuit.gsgcCircuit.Create(GsGridControl)
+Gui.F_Trans_Circuit.gsgcCircuit.Size(8445,4830)
+Gui.F_Trans_Circuit.gsgcCircuit.Position(0,0)
+Gui.F_Trans_Circuit.gsgcCircuit.Anchor(15)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+'Author: Bix
+'Date: 6/24/2019
+'GCG_5591_Issue_Material_Post.g2u
+'Prompts for optional Circuit Board Design info after issuing material
+V.Local.sError.Declare
+V.Local.sFileString.Declare
+V.Local.sFile.Declare
+V.Local.bExists.Declare
+F.Intrinsic.Control.Try
+
+'DEBUG
+'F.Intrinsic.Control.CallSub(CheckIssueMaterial,"Job","000002","Suffix","000","Date","06272019")
+
+F.Intrinsic.Control.SelectCase(V.Caller.Hook)
+	F.Intrinsic.Control.Case(28840)
+		'Issue Material Pre Save
+		F.Intrinsic.String.Build("{1}{0}{2}{0}{3}",V.Ambient.NewLine,V.Passed.000002,V.Passed.000003,V.Passed.000005,V.Local.sFileString)
+		F.Intrinsic.String.Build("{0}GCG_5591_JobandSuffixNum{1}.txt",V.Caller.LocalGSSTempDir,V.Caller.Terminal,V.Local.sFile)
+		F.Intrinsic.File.String2File(V.Local.sFile,V.Local.sFileString)
+	F.Intrinsic.Control.Case(28842)
+		'Issue Material Post Save
+		F.Intrinsic.String.Build("{0}GCG_5591_JobandSuffixNum{1}.txt",V.Caller.LocalGSSTempDir,V.Caller.Terminal,V.Local.sFile)
+		F.Intrinsic.File.File2String(V.Local.sFile,V.Local.sFileString)
+		F.Intrinsic.File.DeleteFile(V.Local.sFile)
+		F.Intrinsic.String.Split(V.Local.sFileString,V.Ambient.NewLine,V.Local.sFileString)
+		F.Intrinsic.Control.CallSub(CheckIssueMaterial,"Job",V.Local.sFileString(0),"Suffix",V.Local.sFileString(1),"Date",V.Local.sFileString(2))
+	F.Intrinsic.Control.Case(28852)
+		'Issue Material Post Exit
+		F.Intrinsic.String.Build("{0}GCG_5591_JobandSuffixNum{1}.txt",V.Caller.LocalGSSTempDir,V.Caller.Terminal,V.Local.sFile)
+		F.Intrinsic.File.Exists(V.Local.sFile,V.Local.bExists)
+		F.Intrinsic.Control.If(V.Local.bExists)
+			F.Intrinsic.File.DeleteFile(V.Local.sFile)
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.CaseElse
+		'PL Maintenance for program
+		F.Intrinsic.Control.CallSub(PLListMaint)
+F.Intrinsic.Control.EndSelect
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.End
+F.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+
+Program.Sub.PLListMaint.Start
+V.Local.sError.Declare
+V.Local.sIcon.Declare
+F.Intrinsic.Control.Try
+
+F.ODBC.Connection!con.OpenCompanyConnection
+F.Data.DataTable.CreateFromSQL("dtPLs","con","select PRODUCT_LINE, PRODUCT_LINE_NAME from GCG_5591_PL_MAINT order by PRODUCT_LINE;",True)
+F.ODBC.Connection!con.Close
+
+Gui.F_PL_List.gsgcPLList.AddGridviewFromDatatable("gvPLList","dtPLs")
+
+Gui.F_PL_List.gsgcPLList.SetGridviewProperty("gvPLList","Editable",False)
+Gui.F_PL_List.gsgcPLList.SetGridviewProperty("gvPLList","ReadOnly",True)
+
+Gui.F_PL_List.gsgcPLList.SetColumnProperty("gvPLList","PRODUCT_LINE","HeaderFontBold",True)
+Gui.F_PL_List.gsgcPLList.SetColumnProperty("gvPLList","PRODUCT_LINE_NAME","HeaderFontBold",True)
+
+Gui.F_PL_List.gsgcPLList.SetColumnProperty("gvPLList","PRODUCT_LINE","Caption","PL")
+Gui.F_PL_List.gsgcPLList.SetColumnProperty("gvPLList","PRODUCT_LINE_NAME","Caption","Product Line Name")
+
+Gui.F_PL_List.gsgcPLList.SetColumnProperty("gvPLList","PRODUCT_LINE","AllowFocus",False)
+Gui.F_PL_List.gsgcPLList.SetColumnProperty("gvPLList","PRODUCT_LINE_NAME","AllowFocus",False)
+
+Gui.F_PL_List.gsgcPLList.SetColumnProperty("gvPLList","PRODUCT_LINE","AllowMove",False)
+Gui.F_PL_List.gsgcPLList.SetColumnProperty("gvPLList","PRODUCT_LINE_NAME","AllowMove",False)
+
+Gui.F_PL_List.gsgcPLList.SetColumnProperty("gvPLList","PRODUCT_LINE","MinWidth",75)
+Gui.F_PL_List.gsgcPLList.SetColumnProperty("gvPLList","PRODUCT_LINE_NAME","MinWidth",250)
+
+Gui.F_PL_List.gsgcPLList.SetColumnProperty("gvPLList","PRODUCT_LINE","MaxWidth",75)
+
+Gui.F_PL_List.gsgcPLList.MainView("gvPLList")
+
+F.Intrinsic.String.Build("{0}\GAB\GAS\gss2.ico",V.Caller.PluginsDir,V.Local.sIcon)
+Gui.F_PL_List..Icon(V.Local.sIcon)
+
+Gui.F_PL_List..Show
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.End
+F.Intrinsic.Control.EndTry
+Program.Sub.PLListMaint.End
+
+Program.Sub.F_PL_List_UnLoad.Start
+F.Intrinsic.Control.End
+Program.Sub.F_PL_List_UnLoad.End
+
+Program.Sub.cmdPLBRW_Click.Start
+V.Local.sError.Declare
+V.Local.sRet.Declare
+F.Intrinsic.Control.Try
+
+F.Intrinsic.UI.Browser(130,,V.Local.sRet)
+
+F.Intrinsic.Control.If(V.Local.sRet.IsNotCancel)
+	F.Intrinsic.String.Split(V.Local.sRet,"*!*",V.Local.sRet)
+	Gui.F_PL_List.txtPL.Text(V.Local.sRet(0).Trim)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.End
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdPLBRW_Click.End
+
+Program.Sub.txtPL_LostFocus.Start
+V.Local.sError.Declare
+V.Local.sSQL.Declare
+V.Local.sRet.Declare
+F.Intrinsic.Control.Try
+
+F.Intrinsic.Control.If(V.Screen.F_PL_List!txtPL.Text.Trim,=,"")
+	F.Intrinsic.Control.ExitSub
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.String.Build("select PRODUCT_LINE from V_PRODUCT_LINE where UPPER(PRODUCT_LINE) = UPPER('{0}');",V.Screen.F_PL_List!txtPL.Text,V.Local.sSQL)
+F.ODBC.Connection!con.OpenCompanyConnection
+F.ODBC.Connection!con.OpenRecordsetRO("rstPL",V.Local.sSQL)
+F.Intrinsic.Control.If(V.ODBC.con!rstPL.EOF,=,False)
+	Gui.F_PL_List.txtPL.Text(V.ODBC.con!rstPL.FieldValTrim!PRODUCT_LINE)
+F.Intrinsic.Control.EndIf
+F.ODBC.con!rstPL.Close
+F.ODBC.Connection!con.Close
+
+F.Intrinsic.String.Build("PRODUCT_LINE = '{0}'",V.Screen.F_PL_List!txtPL.Text,V.Local.sSQL)
+F.Data.DataTable.Select("dtPLs",V.Local.sSQL,V.Local.sRet)
+F.Intrinsic.Control.If(V.Local.sRet.IsNotNoReturn)
+	Gui.F_PL_List.txtPL.Text("")
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.End
+F.Intrinsic.Control.EndTry
+Program.Sub.txtPL_LostFocus.End
+
+Program.Sub.txtPL_KeyPressEnter.Start
+V.Local.sError.Declare
+F.Intrinsic.Control.Try
+
+F.Intrinsic.Control.CallSub(txtPL_LostFocus)
+F.Intrinsic.Control.CallSub(cmdAdd_Click)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.End
+F.Intrinsic.Control.EndTry
+Program.Sub.txtPL_KeyPressEnter.End
+
+Program.Sub.cmdAdd_Click.Start
+V.Local.sError.Declare
+V.Local.sSQL.Declare
+F.Intrinsic.Control.Try
+
+F.Intrinsic.Control.If(V.Screen.F_PL_List!txtPL.Text.Trim,=,"")
+	F.Intrinsic.Control.ExitSub
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.String.Build("select PRODUCT_LINE, PRODUCT_LINE_NAME from V_PRODUCT_LINE where UPPER(PRODUCT_LINE) = UPPER('{0}');",V.Screen.F_PL_List!txtPL.Text,V.Local.sSQL)
+F.ODBC.Connection!con.OpenCompanyConnection
+F.ODBC.Connection!con.OpenRecordsetRO("rstPL",V.Local.sSQL)
+F.Intrinsic.Control.If(V.ODBC.con!rstPL.EOF,=,False)
+	F.Data.DataTable.AddRow("dtPLs","PRODUCT_LINE",V.ODBC.con!rstPL.FieldValTrim!PRODUCT_LINE,"PRODUCT_LINE_NAME",V.ODBC.con!rstPL.FieldValTrim!PRODUCT_LINE_NAME)
+	Gui.F_PL_List.txtPL.Text("")
+F.Intrinsic.Control.EndIf
+F.ODBC.con!rstPL.Close	
+F.ODBC.Connection!con.Close
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.End
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdAdd_Click.End
+
+Program.Sub.cmdDelete_Click.Start
+V.Local.sError.Declare
+V.Local.sRet.Declare
+V.Local.iCnt.Declare
+V.Local.iRow.Declare
+F.Intrinsic.Control.Try
+
+Gui.F_PL_List.gsgcPLList.GetSelectedRows("gvPLList",V.Local.sRet)
+
+F.Intrinsic.Control.If(V.Local.sRet.Trim,!=,"")
+	F.Intrinsic.String.Split(V.Local.sRet,"*!*",V.Local.sRet)
+	
+	F.Intrinsic.Control.For(V.Local.iCnt,V.Local.sRet.UBound,0,-1)
+		F.Data.DataTable.DeleteRow("dtPLs",V.Local.sRet(V.Local.iCnt).Long)
+	F.Intrinsic.Control.Next(V.Local.iCnt)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.End
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdDelete_Click.End
+
+Program.Sub.cmdSave_Click.Start
+V.Local.sError.Declare
+F.Intrinsic.Control.Try
+
+F.ODBC.Connection!con.OpenCompanyConnection
+F.ODBC.Connection!con.Execute("delete from GCG_5591_PL_MAINT")
+F.Data.DataTable.SaveToDB("dtPLs","con","GCG_5591_PL_MAINT","PRODUCT_LINE",256)
+F.ODBC.Connection!con.Close
+F.Data.DataTable.AcceptChanges("dtPLs")
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.End
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdSave_Click.End
+
+Program.Sub.CheckIssueMaterial.Start
+V.Local.sError.Declare
+V.Local.sPL.Declare
+V.Local.sSQL.Declare
+V.Local.sFilter.Declare
+V.Local.dSeqDate.Declare
+V.Local.sIcon.Declare
+V.Local.iCnt.Declare
+F.Intrinsic.Control.Try
+
+F.Intrinsic.Date.ConvertDString(V.Args.Date,"MMDDYYYY",V.Local.dSeqDate)
+
+F.ODBC.Connection!con.OpenCompanyConnection
+F.ODBC.Connection!con.ExecuteAndReturn("select PRODUCT_LINE from GCG_5591_PL_MAINT;",V.Local.sPL)
+F.Intrinsic.String.Build("select JOB, SUFFIX, SEQ, SEQUENCE_KEY, DATE_SEQUENCE, DATE_SEQUENCE_UF, DESCRIPTION, PART, HOURS_WORKED as QTY, JOB+SUFFIX+SEQ+SEQUENCE_KEY+DATE_SEQUENCE_UF as KEY_F, '' as PRESENT, '' as CIRCUIT_NUM, PART+LOCATION  as PARTLOC, '' as PRODUCT_LINE from V_JOB_DETAIL where LMO = 'M' and LAST_CHG_PROG = 'JB0075GI' and LAST_CHG_BY = '{0}' and JOB = '{1}' and SUFFIX = '{2}' and DATE_SEQUENCE = '{3}';",V.Caller.User,V.Args.Job,V.Args.Suffix,V.Local.dSeqDate.PervasiveDate,V.Local.sSQL)
+F.Data.DataTable.CreateFromSQL("dtTransactions","con",V.Local.sSQL,True)
+F.Data.Dictionary.CreateFromSQL("dictCircuitBoards","con","select JOB+SUFFIX+SEQ+SEQUENCE_KEY+DATE_SEQUENCE_UF, 'Y' as PRESENT from GCG_5591_TRAN_CERT;")
+F.Data.Dictionary.CreateFromSQL("dictPLMaster","con","select PART+LOCATION, PRODUCT_LINE from V_INVENTORY_ALL;")
+F.Data.DataTable.CreateFromSQL("dtCircuitBoard","con","select * from GCG_5591_TRAN_CERT where JOB = '' and SUFFIX = '';",True)
+F.Data.DataTable.DeleteRow("dtCircuitBoard")
+F.Intrinsic.String.Build("select PART, LOCATION, DATE_HISTORY, JOB, SUFFIX, SEQUENCE as SEQ, DTL_KEY_SEQ as SEQUENCE_KEY, LOT, BIN, HEAT, SERIAL_NUMBER, -1 * QUANTITY as QTY from V_ITEM_HISTORY where CODE_TRANSACTION = 'J55' and PROGRAM_USED = 'JB0075GI' and USERID = '{0}' and DATE_HISTORY = '{1}';",V.Caller.User,V.Local.dSeqDate.PervasiveDate,V.Local.sSQL)
+F.Data.DataTable.CreateFromSQL("dtItemHistory","con",V.Local.sSQL,True)
+F.ODBC.Connection!con.Close
+
+F.Data.Dictionary.SetDefaultReturn("dictCircuitBoards","N")
+F.Data.DataTable.FillFromDictionary("dtTransactions","dictCircuitBoards","KEY_F","PRESENT")
+F.Data.Dictionary.Close("dictCircuitBoards")
+F.Data.Dictionary.SetDefaultReturn("dictPLMaster","")
+F.Data.DataTable.FillFromDictionary("dtTransactions","dictPLMaster","PARTLOC","PRODUCT_LINE")
+F.Data.Dictionary.Close("dictPLMaster")
+
+'List PLs
+F.Intrinsic.String.Split(V.Local.sPL,"#$#",V.Local.sPL)
+F.Intrinsic.String.Join(V.Local.sPL,"', '",V.Local.sPL)
+V.Local.sPL.RedimPreserve(0,0)
+F.Intrinsic.String.Build("PRESENT = 'N' and PRODUCT_LINE in ('{0}')",V.Local.sPL,V.Local.sFilter)
+
+F.Data.DataView.Create("dtTransactions","dvPLCheck",22,V.Local.sFilter,"JOB desc, SUFFIX desc, SEQ desc")
+F.Data.DataView.ToDataTable("dtTransactions","dvPLCheck","dtCircuitBoardExtra",True)
+F.Data.DataTable.Merge("dtCircuitBoardExtra","dtCircuitBoard",True,2)
+F.Intrinsic.Control.If(V.DataTable.dtCircuitBoard.RowCount,=,0)
+	F.Intrinsic.Control.ExitSub
+F.Intrinsic.Control.EndIf
+F.Data.DataTable.Close("dtTransactions")
+F.Data.DataTable.Close("dtCircuitBoardExtra")
+
+F.Intrinsic.Control.CallSub(GenerateSerialSeries)
+F.Data.DataTable.Close("dtItemHistory")
+
+F.Data.DataView.Create("dtCircuitBoard","dvOrderedSheet",22,,"JOB asc, SUFFIX asc, SEQ asc, QTY_SERIAL asc")
+Gui.F_Trans_Circuit.gsgcCircuit.AddGridviewFromDataView("gvCircuit","dtCircuitBoard","dvOrderedSheet")
+
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","SEQUENCE_KEY","Visible",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","DATE_SEQUENCE","Visible",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","DATE_SEQUENCE_UF","Visible",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","LAST_CHG_USER","Visible",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","LAST_CHG_DATETIME","Visible",False)
+
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","JOB","HeaderFontBold",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","SUFFIX","HeaderFontBold",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","SEQ","HeaderFontBold",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","DESCRIPTION","HeaderFontBold",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","PART","HeaderFontBold",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","QTY","HeaderFontBold",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","CIRCUIT_NUM","HeaderFontBold",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","PRODUCT_LINE","HeaderFontBold",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","QTY_SERIAL","HeaderFontBold",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","LOT","HeaderFontBold",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","BIN","HeaderFontBold",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","HEAT","HeaderFontBold",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","SERIAL_NUMBER","HeaderFontBold",True)
+
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","JOB","Caption","Job")
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","SUFFIX","Caption","Suffix")
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","SEQ","Caption","Seq")
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","DESCRIPTION","Caption","Description")
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","PART","Caption","Part")
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","QTY","Caption","Iss'd Qty")
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","CIRCUIT_NUM","Caption","Circuit Designator")
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","PRODUCT_LINE","Caption","PL")
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","QTY_SERIAL","Caption","Qty #")
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","LOT","Caption","Lot")
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","BIN","Caption","Bin")
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","HEAT","Caption","Heat")
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","SERIAL_NUMBER","Caption","Serial")
+
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","JOB","AllowEdit",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","SUFFIX","AllowEdit",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","SEQ","AllowEdit",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","DESCRIPTION","AllowEdit",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","PART","AllowEdit",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","QTY","AllowEdit",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","CIRCUIT_NUM","AllowEdit",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","PRODUCT_LINE","AllowEdit",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","QTY_SERIAL","AllowEdit",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","LOT","AllowEdit",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","BIN","AllowEdit",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","HEAT","AllowEdit",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","SERIAL_NUMBER","AllowEdit",False)
+
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","JOB","ReadOnly",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","SUFFIX","ReadOnly",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","SEQ","ReadOnly",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","DESCRIPTION","ReadOnly",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","PART","ReadOnly",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","QTY","ReadOnly",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","CIRCUIT_NUM","ReadOnly",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","PRODUCT_LINE","ReadOnly",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","QTY_SERIAL","ReadOnly",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","LOT","ReadOnly",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","BIN","ReadOnly",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","HEAT","ReadOnly",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","SERIAL_NUMBER","ReadOnly",True)
+
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","JOB","AllowFocus",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","SUFFIX","AllowFocus",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","SEQ","AllowFocus",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","DESCRIPTION","AllowFocus",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","PART","AllowFocus",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","QTY","AllowFocus",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","CIRCUIT_NUM","AllowFocus",True)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","PRODUCT_LINE","AllowFocus",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","QTY_SERIAL","AllowFocus",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","LOT","AllowFocus",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","BIN","AllowFocus",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","HEAT","AllowFocus",False)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","SERIAL_NUMBER","AllowFocus",False)
+
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","JOB","MinWidth",45)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","JOB","MaxWidth",45)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","SUFFIX","MinWidth",50)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","SUFFIX","MaxWidth",50)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","SEQ","MinWidth",45)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","SEQ","MaxWidth",45)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","DESCRIPTION","MinWidth",250)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","PART","MinWidth",150)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","PART","MaxWidth",200)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","QTY","MinWidth",75)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","QTY","MaxWidth",75)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","CIRCUIT_NUM","MinWidth",120)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","CIRCUIT_NUM","MaxWidth",120)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","PRODUCT_LINE","MinWidth",35)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","PRODUCT_LINE","MaxWidth",35)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","QTY_SERIAL","MinWidth",50)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","QTY_SERIAL","MaxWidth",50)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","LOT","MinWidth",135)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","LOT","MaxWidth",200)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","BIN","MinWidth",45)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","BIN","MaxWidth",45)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","HEAT","MinWidth",135)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","HEAT","MaxWidth",200)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","SERIAL_NUMBER","MinWidth",250)
+
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","CIRCUIT_NUM","MaxLength",4)
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","CIRCUIT_NUM","CellBackColor","LightYellow")
+Gui.F_Trans_Circuit.gsgcCircuit.SetColumnProperty("gvCircuit","QTY","DisplayCustomNumeric","#,###,##0.0000")
+
+Gui.F_Trans_Circuit.gsgcCircuit.MainView("gvCircuit")
+
+F.Intrinsic.String.Build("{0}\GAB\GAS\gss2.ico",V.Caller.PluginsDir,V.Local.sIcon)
+Gui.F_Trans_Circuit..Icon(V.Local.sIcon)
+
+Gui.F_Trans_Circuit..Show
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.End
+F.Intrinsic.Control.EndTry
+Program.Sub.CheckIssueMaterial.End
+
+Program.Sub.F_Trans_Circuit_UnLoad.Start
+V.Local.sError.Declare
+V.Local.iRet.Declare
+F.Intrinsic.Control.Try
+
+F.Data.DataView.Create("dtCircuitBoard","dvBlankCircuit",22,"CIRCUIT_NUM = ''",)
+F.Intrinsic.Control.If(V.DataView.dtCircuitBoard!dvBlankCircuit.RowCount,>,0)
+	F.Intrinsic.UI.Msgbox("You have left some entries that prompt for a circuit board designation. Are you sure you wish to continue and leave these circuit boards blank?","Warning!",4,V.Local.iRet)
+	F.Intrinsic.Control.If(V.Local.iRet,=,7)
+		'No
+		F.Data.DataView.Close("dtCircuitBoard","dvBlankCircuit")
+		F.Intrinsic.Control.ExitSub
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndIf
+
+F.Data.DataTable.SetValue("dtCircuitBoard",-1,"LAST_CHG_USER",V.Caller.User,"LAST_CHG_DATETIME",V.Ambient.Now.String)
+
+F.ODBC.Connection!con.OpenCompanyConnection
+F.Data.DataTable.SaveToDB("dtCircuitBoard","con","GCG_5591_TRAN_CERT","JOB*!*SUFFIX*!*SEQ*!*DATE_SEQUENCE_UF*!*SEQUENCE_KEY*!*QTY_SERIAL",128)
+F.ODBC.Connection!con.Close
+F.Intrinsic.Control.End
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.End
+F.Intrinsic.Control.EndTry
+Program.Sub.F_Trans_Circuit_UnLoad.End
+
+Program.Sub.GenerateSerialSeries.Start
+V.Local.sError.Declare
+V.Local.iCnt.Declare
+V.Local.iQty.Declare
+V.Local.iQtyCnt.Declare
+V.Local.iMaxCnt.Declare
+V.Local.sFilter.Declare
+V.Local.fNewQty.Declare
+V.Local.sRows.Declare
+F.Intrinsic.Control.Try
+
+V.Local.iMaxCnt.Set(V.DataTable.dtCircuitBoard.RowCount--)
+
+F.Intrinsic.Control.For(V.Local.iCnt,0,V.Local.iMaxCnt,1)
+	F.Intrinsic.Math.Floor(V.DataTable.dtCircuitBoard(V.Local.iCnt).QTY!FieldVal,V.Local.iQty)
+	F.Intrinsic.String.Build("QTY > 0 and JOB = '{0}' and SUFFIX = '{1}' and SEQ = '{2}' and SEQUENCE_KEY = '{3}' and DATE_HISTORY = '{4}'",V.DataTable.dtCircuitBoard(V.Local.iCnt).JOB!FieldVal,V.DataTable.dtCircuitBoard(V.Local.iCnt).SUFFIX!FieldVal,V.DataTable.dtCircuitBoard(V.Local.iCnt).SEQ!FieldVal,V.DataTable.dtCircuitBoard(V.Local.iCnt).SEQUENCE_KEY!FieldVal,V.DataTable.dtCircuitBoard(V.Local.iCnt).DATE_SEQUENCE!FieldVal,V.Local.sFilter)
+	F.Data.DataTable.Select("dtItemHistory",V.Local.sFilter,V.Local.sRows)
+	F.Intrinsic.Control.If(V.Local.sRows.IsNotNoReturn)
+		F.Intrinsic.String.Split(V.Local.sRows,"*!*",V.Local.sRows)
+		F.Intrinsic.Math.Sub(V.DataTable.dtItemHistory(V.Local.sRows(0).Long).QTY!FieldVal,1,V.Local.fNewQty)
+		F.Data.DataTable.SetValue("dtItemHistory",V.Local.sRows(0).Long,"QTY",V.Local.fNewQty)
+		F.Data.DataTable.SetValue("dtCircuitBoard",V.Local.iCnt,"QTY_SERIAL",1,"LOT",V.DataTable.dtItemHistory(V.Local.sRows(0).Long).LOT!FieldValTrim,"BIN",V.DataTable.dtItemHistory(V.Local.sRows(0).Long).BIN!FieldValTrim,"HEAT",V.DataTable.dtItemHistory(V.Local.sRows(0).Long).HEAT!FieldValTrim,"SERIAL_NUMBER",V.DataTable.dtItemHistory(V.Local.sRows(0).Long).SERIAL_NUMBER!FieldValTrim)
+		V.Local.sRows.Redim(0,0)
+		F.Intrinsic.Control.For(V.Local.iQtyCnt,2,V.Local.iQty,1)
+			F.Intrinsic.String.Build("QTY > 0 and JOB = '{0}' and SUFFIX = '{1}' and SEQ = '{2}' and SEQUENCE_KEY = '{3}' and DATE_HISTORY = '{4}'",V.DataTable.dtCircuitBoard(V.Local.iCnt).JOB!FieldVal,V.DataTable.dtCircuitBoard(V.Local.iCnt).SUFFIX!FieldVal,V.DataTable.dtCircuitBoard(V.Local.iCnt).SEQ!FieldVal,V.DataTable.dtCircuitBoard(V.Local.iCnt).SEQUENCE_KEY!FieldVal,V.DataTable.dtCircuitBoard(V.Local.iCnt).DATE_SEQUENCE!FieldVal,V.Local.sFilter)
+			F.Data.DataTable.Select("dtItemHistory",V.Local.sFilter,V.Local.sRows)
+			F.Intrinsic.String.Split(V.Local.sRows,"*!*",V.Local.sRows)
+			F.Intrinsic.Math.Sub(V.DataTable.dtItemHistory(V.Local.sRows(0).Long).QTY!FieldVal,1,V.Local.fNewQty)
+			F.Data.DataTable.SetValue("dtItemHistory",V.Local.sRows(0).Long,"QTY",V.Local.fNewQty)
+			F.Data.DataTable.AddRow("dtCircuitBoard","JOB",V.DataTable.dtCircuitBoard(V.Local.iCnt).JOB!FieldVal,"SUFFIX",V.DataTable.dtCircuitBoard(V.Local.iCnt).SUFFIX!FieldVal,"SEQ",V.DataTable.dtCircuitBoard(V.Local.iCnt).SEQ!FieldVal,"SEQUENCE_KEY",V.DataTable.dtCircuitBoard(V.Local.iCnt).SEQUENCE_KEY!FieldVal,"DATE_SEQUENCE",V.DataTable.dtCircuitBoard(V.Local.iCnt).DATE_SEQUENCE!FieldVal,"DATE_SEQUENCE_UF",V.DataTable.dtCircuitBoard(V.Local.iCnt).DATE_SEQUENCE_UF!FieldVal,"DESCRIPTION",V.DataTable.dtCircuitBoard(V.Local.iCnt).DESCRIPTION!FieldVal,"PART",V.DataTable.dtCircuitBoard(V.Local.iCnt).PART!FieldVal,"LOT",V.DataTable.dtItemHistory(V.Local.sRows(0).Long).LOT!FieldValTrim,"BIN",V.DataTable.dtItemHistory(V.Local.sRows(0).Long).BIN!FieldValTrim,"HEAT",V.DataTable.dtItemHistory(V.Local.sRows(0).Long).HEAT!FieldValTrim,"SERIAL_NUMBER",V.DataTable.dtItemHistory(V.Local.sRows(0).Long).SERIAL_NUMBER!FieldValTrim,"QTY",V.DataTable.dtCircuitBoard(V.Local.iCnt).QTY!FieldVal,"CIRCUIT_NUM",V.DataTable.dtCircuitBoard(V.Local.iCnt).CIRCUIT_NUM!FieldVal,"PRODUCT_LINE",V.DataTable.dtCircuitBoard(V.Local.iCnt).PRODUCT_LINE!FieldVal,"QTY_SERIAL",V.Local.iQtyCnt)
+			V.Local.sRows.Redim(0,0)
+		F.Intrinsic.Control.Next(V.Local.iQtyCnt)
+	F.Intrinsic.Control.Else
+		F.Data.DataTable.SetValue("dtCircuitBoard",V.Local.iCnt,"QTY_SERIAL",1)
+		F.Intrinsic.Control.For(V.Local.iQtyCnt,2,V.Local.iQty,1)
+			F.Data.DataTable.AddRow("dtCircuitBoard","JOB",V.DataTable.dtCircuitBoard(V.Local.iCnt).JOB!FieldVal,"SUFFIX",V.DataTable.dtCircuitBoard(V.Local.iCnt).SUFFIX!FieldVal,"SEQ",V.DataTable.dtCircuitBoard(V.Local.iCnt).SEQ!FieldVal,"SEQUENCE_KEY",V.DataTable.dtCircuitBoard(V.Local.iCnt).SEQUENCE_KEY!FieldVal,"DATE_SEQUENCE",V.DataTable.dtCircuitBoard(V.Local.iCnt).DATE_SEQUENCE!FieldVal,"DATE_SEQUENCE_UF",V.DataTable.dtCircuitBoard(V.Local.iCnt).DATE_SEQUENCE_UF!FieldVal,"DESCRIPTION",V.DataTable.dtCircuitBoard(V.Local.iCnt).DESCRIPTION!FieldVal,"PART",V.DataTable.dtCircuitBoard(V.Local.iCnt).PART!FieldVal,"QTY",V.DataTable.dtCircuitBoard(V.Local.iCnt).QTY!FieldVal,"CIRCUIT_NUM",V.DataTable.dtCircuitBoard(V.Local.iCnt).CIRCUIT_NUM!FieldVal,"PRODUCT_LINE",V.DataTable.dtCircuitBoard(V.Local.iCnt).PRODUCT_LINE!FieldVal,"QTY_SERIAL",V.Local.iQtyCnt)
+		F.Intrinsic.Control.Next(V.Local.iQtyCnt)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.Next(V.Local.iCnt)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.End
+F.Intrinsic.Control.EndTry
+Program.Sub.GenerateSerialSeries.End
